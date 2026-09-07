@@ -495,7 +495,9 @@ public class WebSocketModule(context: ReactApplicationContext) :
 
     /**
      * Get the URI used to look up cookies for a specific WebSocket URI, keeping its path so that
-     * path-scoped cookies are matched correctly
+     * path-scoped cookies are matched correctly. Query and fragment are dropped since cookies are
+     * scoped by path, not by query or fragment (RFC 6265). userInfo is also dropped so that
+     * credentials embedded in the URL are never forwarded to the cookie store.
      *
      * @param uri
      * @return A URI with the endpoint converted to HTTP protocol (http[s]://host[:port]/path)
@@ -509,8 +511,8 @@ public class WebSocketModule(context: ReactApplicationContext) :
             requestURI.host,
             requestURI.port,
             requestURI.path,
-            requestURI.query,
-            requestURI.fragment,
+            null,
+            null,
         )
       } catch (e: URISyntaxException) {
         throw IllegalArgumentException("Unable to get cookie lookup URI from $uri")

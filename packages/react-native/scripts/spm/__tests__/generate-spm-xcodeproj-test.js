@@ -176,6 +176,31 @@ describe('scheme pre-action', () => {
       updated,
     );
   });
+
+  it('refreshes shellToInvoke when it appears before scriptText', () => {
+    const reordered = generateXcscheme(
+      'MyApp',
+      'TARGET_UUID',
+      'MyApp',
+      'SCRIPT',
+    ).replace(
+      'scriptText = "SCRIPT"\n               shellToInvoke = "/bin/bash">',
+      'shellToInvoke = "/bin/bash"\n               scriptText = "SCRIPT">',
+    );
+    const updated = addPreActionToScheme(reordered, 'TARGET_UUID', 'SCRIPT');
+    expect(updated.match(/shellToInvoke/g)).toHaveLength(1);
+  });
+
+  it('refreshes shellToInvoke with no spaces around the equals sign', () => {
+    const unspaced = generateXcscheme(
+      'MyApp',
+      'TARGET_UUID',
+      'MyApp',
+      'SCRIPT',
+    ).replace('shellToInvoke = "/bin/bash"', 'shellToInvoke="/bin/bash"');
+    const updated = addPreActionToScheme(unspaced, 'TARGET_UUID', 'SCRIPT');
+    expect(updated.match(/shellToInvoke/g)).toHaveLength(1);
+  });
 });
 
 describe('sync scripts', () => {

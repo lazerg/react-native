@@ -1898,12 +1898,19 @@ function addPreActionToScheme(
     // attribute names (default /bin/sh), independent of a
     // PBXShellScriptBuildPhase's own shellPath (see shellScriptPhase) — pin
     // it to bash too. `>` can't appear unescaped inside either attribute
-    // value, so it reliably closes the ActionContent open tag.
+    // value, so it reliably closes the ActionContent open tag. Search the
+    // whole open tag (not just after scriptText) and allow any spacing
+    // around `=`, since attribute order and formatting aren't guaranteed.
+    const contentOpenIdx = xmlWithScript.lastIndexOf(
+      '<ActionContent',
+      titleIdx,
+    );
     const contentCloseIdx = xmlWithScript.indexOf('>', stIdx);
-    const shellToInvokeMarker = 'shellToInvoke = "';
-    const stiIdx = xmlWithScript.indexOf(shellToInvokeMarker, valueStart);
-    if (stiIdx >= 0 && stiIdx < contentCloseIdx) {
-      const stiValueStart = stiIdx + shellToInvokeMarker.length;
+    const openTag = xmlWithScript.slice(contentOpenIdx, contentCloseIdx);
+    const stiMatch = openTag.match(/shellToInvoke\s*=\s*"/);
+    if (stiMatch != null) {
+      const stiValueStart =
+        contentOpenIdx + stiMatch.index + stiMatch[0].length;
       const stiValueEnd = xmlWithScript.indexOf('"', stiValueStart);
       xmlWithScript =
         xmlWithScript.slice(0, stiValueStart) +

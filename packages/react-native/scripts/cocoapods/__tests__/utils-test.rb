@@ -758,17 +758,18 @@ class UtilsTests < Test::Unit::TestCase
         assert_equal([], $collected_commands)
     end
 
-    def test_createXcodeEnvIfMissing_whenLocalNodeIsMissing_recreatesLocal
+    def test_createXcodeEnvIfMissing_whenLocalNodeIsMissing_updatesNodeBinary
         # Arrange
         FileMock.mocked_existing_files(["/.xcode.env", "/.xcode.env.local"])
         FileMock.files_to_read({
-            "/.xcode.env.local" => "export NODE_BINARY=/Users/me/.nvm/versions/node/v24.18.1/bin/node\n",
+            "/.xcode.env.local" => "export FOO=bar\nexport NODE_BINARY=/old/bin/node\n",
         })
         # Act
         ReactNativePodsUtils.create_xcode_env_if_missing(file_manager: FileMock)
         # Assert
-        assert_equal(1, $collected_commands.length)
-        assert_match(/^echo 'export NODE_BINARY=.*' > \/\.xcode\.env\.local$/, $collected_commands[0])
+        assert_equal(["/.xcode.env", "/.xcode.env.local", "/old/bin/node"], FileMock.exist_invocation_params)
+        assert_equal([], $collected_commands)
+        assert_match(/\Aexport FOO=bar\nexport NODE_BINARY=(?!\/old\/bin\/node).+\n\z/, FileMock.written_files["/.xcode.env.local"])
     end
 
     def test_createXcodeEnvIfMissing_whenTheyAreNotPresent_createsThem

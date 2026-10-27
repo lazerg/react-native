@@ -37,19 +37,19 @@ import {
  * enableNativeEventTargetEventDispatching is enabled.
  */
 export default function dispatchNativeEvent(
-  target: EventTarget | null,
+  target: ?EventTarget,
   type: string,
   payload: {[string]: unknown},
 ): void {
   // $FlowFixMe[incompatible-type] The global is backed by this implementation.
-  const internalTarget = target as InternalEventTarget | null;
+  const internalTarget = target as ?InternalEventTarget;
 
   // Process responder events before normal event dispatch.
   processResponderEvent(type, internalTarget, payload);
 
   try {
-    // The target is null when its view unmounted during the touch, so only the
-    // responder step above applies.
+    // The target is missing when its view unmounted during the touch, so only
+    // the responder step above applies.
     if (internalTarget == null) {
       return;
     }

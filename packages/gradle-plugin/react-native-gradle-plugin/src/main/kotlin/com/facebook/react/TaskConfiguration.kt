@@ -71,6 +71,7 @@ internal fun Project.configureReactTasks(variant: Variant, config: ReactExtensio
           task.cliFile.set(cliFile)
           task.bundleCommand.set(config.bundleCommand)
           task.entryFile.set(detectedEntryFile(config, entryFileEnvVariable))
+          task.resetMetroCache.set(config.resetMetroCache)
           task.extraPackagerArgs.set(config.extraPackagerArgs)
           task.bundleConfig.set(config.bundleConfig)
           task.bundleAssetName.set(config.bundleAssetName)

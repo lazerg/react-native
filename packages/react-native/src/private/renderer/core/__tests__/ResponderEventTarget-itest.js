@@ -14,6 +14,10 @@ import '@react-native/fantom/src/setUpDefaultReactNativeEnvironment';
 import * as Fantom from '@react-native/fantom';
 import * as React from 'react';
 import {View} from 'react-native';
+import {
+  ReactNativeFeatureFlags,
+  dispatchNativeEvent,
+} from 'react-native/react-private-interface';
 
 // Helpers for common touch event payloads
 function touchStart(identifier: number = 0): {
@@ -131,6 +135,54 @@ describe('Responder System', () => {
 
     expect(onResponderRelease).toHaveBeenCalledTimes(1);
   });
+
+  (ReactNativeFeatureFlags.enableNativeEventTargetEventDispatching()
+    ? it
+    : it.skip)(
+    'dispatches responder release on touch end without a target',
+    () => {
+      const root = Fantom.createRoot();
+      const ref = React.createRef<React.ElementRef<typeof View>>();
+      const onResponderGrant = jest.fn();
+      const onResponderRelease = jest.fn();
+
+      Fantom.runTask(() => {
+        root.render(
+          <View
+            ref={ref}
+            onStartShouldSetResponder={() => true}
+            onResponderGrant={onResponderGrant}
+            onResponderRelease={onResponderRelease}
+          />,
+        );
+      });
+
+      Fantom.dispatchNativeEvent(ref, 'onTouchStart', touchStart(), {
+        category: Fantom.NativeEventCategory.Discrete,
+      });
+
+      expect(onResponderGrant).toHaveBeenCalledTimes(1);
+
+      // The target is null when the touched view unmounted during the touch.
+      dispatchNativeEvent(null, 'topTouchEnd', {
+        touches: [],
+        changedTouches: [{identifier: 0, pageX: 0, pageY: 0, timestamp: 200}],
+      });
+
+      expect(onResponderRelease).toHaveBeenCalledTimes(1);
+
+      // Responder was cleared, so the next touch is granted again
+      Fantom.dispatchNativeEvent(ref, 'onTouchStart', touchStart(), {
+        category: Fantom.NativeEventCategory.Discrete,
+      });
+
+      expect(onResponderGrant).toHaveBeenCalledTimes(2);
+
+      Fantom.dispatchNativeEvent(ref, 'onTouchEnd', touchEnd(), {
+        category: Fantom.NativeEventCategory.Discrete,
+      });
+    },
+  );
 
   it('dispatches responderTerminate on touch cancel', () => {
     const root = Fantom.createRoot();

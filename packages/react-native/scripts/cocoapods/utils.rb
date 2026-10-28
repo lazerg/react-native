@@ -315,7 +315,7 @@ class ReactNativePodsUtils
             node_binary = Shellwords.escape(`node --print "process.argv[0]"`.strip)
             if local_file_exists
                 local_env = file_manager.read("#{file_path}.local")
-                file_manager.write("#{file_path}.local", local_env.gsub(/^export NODE_BINARY=.+$/) { "export NODE_BINARY=#{node_binary}" })
+                file_manager.write("#{file_path}.local", local_env.gsub(/^export NODE_BINARY=.*$/) { "export NODE_BINARY=#{node_binary}" })
             else
                 system("echo 'export NODE_BINARY=#{node_binary}' > #{file_path}.local")
             end
@@ -323,9 +323,12 @@ class ReactNativePodsUtils
     end
 
     def self.local_node_binary_exists?(local_file_path, file_manager: File)
-        node_binary = file_manager.read(local_file_path).scan(/^export NODE_BINARY=(.+)$/).flatten.last
-        return true if node_binary.nil? || !node_binary.start_with?("/")
-        return file_manager.exist?(Shellwords.split(node_binary).first)
+        node_binary = file_manager.read(local_file_path).scan(/^export NODE_BINARY=(.*)$/).flatten.last
+        return true if node_binary.nil?
+        node_binary = Shellwords.split(node_binary).first
+        return false if node_binary.nil? || node_binary.empty?
+        return true if !node_binary.start_with?("/")
+        return file_manager.exist?(node_binary)
     end
 
     # It examines the target_definition property and sets the appropriate value for

@@ -92,12 +92,6 @@ abstract class ReactExtension @Inject constructor(val project: Project) {
    */
   val enableSoCleanup: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
 
-  /**
-   * Whether to pass `--reset-cache` to the [bundleCommand]. Disable it to keep the Metro cache
-   * between release builds. Default: true
-   */
-  val resetMetroCache: Property<Boolean> = objects.property(Boolean::class.java).convention(true)
-
   /** Extra args that will be passed to the [bundleCommand] Default: [] */
   val extraPackagerArgs: ListProperty<String> =
       objects.listProperty(String::class.java).convention(emptyList())

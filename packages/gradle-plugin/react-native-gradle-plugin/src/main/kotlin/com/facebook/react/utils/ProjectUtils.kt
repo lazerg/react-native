@@ -12,6 +12,7 @@ import com.facebook.react.model.ModelPackageJson
 import com.facebook.react.utils.PropertyUtils.EDGE_TO_EDGE_ENABLED
 import com.facebook.react.utils.PropertyUtils.HERMES_ENABLED
 import com.facebook.react.utils.PropertyUtils.REACT_NATIVE_ARCHITECTURES
+import com.facebook.react.utils.PropertyUtils.RESET_METRO_CACHE_BEFORE_BUNDLING
 import com.facebook.react.utils.PropertyUtils.SCOPED_EDGE_TO_EDGE_ENABLED
 import com.facebook.react.utils.PropertyUtils.SCOPED_HERMES_ENABLED
 import com.facebook.react.utils.PropertyUtils.SCOPED_REACT_NATIVE_ARCHITECTURES
@@ -71,6 +72,18 @@ internal object ProjectUtils {
             project.property(USE_THIRD_PARTY_JSC).toString().toBoolean()) ||
             (project.hasProperty(SCOPED_USE_THIRD_PARTY_JSC) &&
                 project.property(SCOPED_USE_THIRD_PARTY_JSC).toString().toBoolean())
+
+  internal val Project.shouldResetMetroCacheBeforeBundling: Boolean
+    get() =
+        if (project.hasProperty(RESET_METRO_CACHE_BEFORE_BUNDLING)) {
+          project
+              .property(RESET_METRO_CACHE_BEFORE_BUNDLING)
+              .toString()
+              .lowercase()
+              .toBooleanStrictOrNull() ?: true
+        } else {
+          true
+        }
 
   internal fun Project.needsCodegenFromPackageJson(rootProperty: DirectoryProperty): Boolean {
     val parsedPackageJson = readPackageJsonFile(this, rootProperty)

@@ -65,7 +65,7 @@ abstract class BundleHermesCTask : DefaultTask() {
 
   @get:Input abstract val devEnabled: Property<Boolean>
 
-  @get:Input abstract val resetMetroCache: Property<Boolean>
+  @get:Input abstract val resetMetroCacheBeforeBundling: Property<Boolean>
 
   @get:Input abstract val extraPackagerArgs: ListProperty<String>
 
@@ -154,7 +154,7 @@ abstract class BundleHermesCTask : DefaultTask() {
           add("android")
           add("--dev")
           add(devEnabled.get().toString())
-          if (resetMetroCache.get()) {
+          if (resetMetroCacheBeforeBundling.get()) {
             add("--reset-cache")
           }
           add("--entry-file")

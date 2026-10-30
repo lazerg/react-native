@@ -17,6 +17,7 @@ import com.facebook.react.utils.ProjectUtils.isHermesEnabled
 import com.facebook.react.utils.ProjectUtils.isNewArchEnabled
 import com.facebook.react.utils.ProjectUtils.isStrictCxxApiEnabled
 import com.facebook.react.utils.ProjectUtils.needsCodegenFromPackageJson
+import com.facebook.react.utils.ProjectUtils.shouldResetMetroCacheBeforeBundling
 import java.io.File
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
@@ -114,6 +115,32 @@ class ProjectUtilsTest {
     val project = createProject()
     project.extensions.extraProperties.set("edgeToEdgeEnabled", "¯\\_(ツ)_/¯")
     assertThat(project.isEdgeToEdgeEnabled).isFalse()
+  }
+
+  @Test
+  fun shouldResetMetroCacheBeforeBundling_returnsTrueByDefault() {
+    assertThat(createProject().shouldResetMetroCacheBeforeBundling).isTrue()
+  }
+
+  @Test
+  fun shouldResetMetroCacheBeforeBundling_withDisabledViaProperty_returnsFalse() {
+    val project = createProject()
+    project.extensions.extraProperties.set("react.resetMetroCacheBeforeBundling", "false")
+    assertThat(project.shouldResetMetroCacheBeforeBundling).isFalse()
+  }
+
+  @Test
+  fun shouldResetMetroCacheBeforeBundling_withEnabledViaProperty_returnsTrue() {
+    val project = createProject()
+    project.extensions.extraProperties.set("react.resetMetroCacheBeforeBundling", "true")
+    assertThat(project.shouldResetMetroCacheBeforeBundling).isTrue()
+  }
+
+  @Test
+  fun shouldResetMetroCacheBeforeBundling_withInvalidViaProperty_returnsTrue() {
+    val project = createProject()
+    project.extensions.extraProperties.set("react.resetMetroCacheBeforeBundling", "¯\\_(ツ)_/¯")
+    assertThat(project.shouldResetMetroCacheBeforeBundling).isTrue()
   }
 
   @Test

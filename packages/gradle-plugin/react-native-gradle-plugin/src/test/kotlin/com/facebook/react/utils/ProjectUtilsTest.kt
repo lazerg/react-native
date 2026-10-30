@@ -125,22 +125,51 @@ class ProjectUtilsTest {
   @Test
   fun shouldResetMetroCacheBeforeBundling_withDisabledViaProperty_returnsFalse() {
     val project = createProject()
-    project.extensions.extraProperties.set("react.resetMetroCacheBeforeBundling", "false")
+    project.extensions.extraProperties.set("resetMetroCacheBeforeBundling", "false")
     assertThat(project.shouldResetMetroCacheBeforeBundling).isFalse()
   }
 
   @Test
   fun shouldResetMetroCacheBeforeBundling_withEnabledViaProperty_returnsTrue() {
     val project = createProject()
-    project.extensions.extraProperties.set("react.resetMetroCacheBeforeBundling", "true")
+    project.extensions.extraProperties.set("resetMetroCacheBeforeBundling", "true")
     assertThat(project.shouldResetMetroCacheBeforeBundling).isTrue()
   }
 
   @Test
   fun shouldResetMetroCacheBeforeBundling_withInvalidViaProperty_returnsTrue() {
     val project = createProject()
+    project.extensions.extraProperties.set("resetMetroCacheBeforeBundling", "¯\\_(ツ)_/¯")
+    assertThat(project.shouldResetMetroCacheBeforeBundling).isTrue()
+  }
+
+  @Test
+  fun shouldResetMetroCacheBeforeBundling_withDisabledViaScopedProperty_returnsFalse() {
+    val project = createProject()
+    project.extensions.extraProperties.set("react.resetMetroCacheBeforeBundling", "false")
+    assertThat(project.shouldResetMetroCacheBeforeBundling).isFalse()
+  }
+
+  @Test
+  fun shouldResetMetroCacheBeforeBundling_withEnabledViaScopedProperty_returnsTrue() {
+    val project = createProject()
+    project.extensions.extraProperties.set("react.resetMetroCacheBeforeBundling", "true")
+    assertThat(project.shouldResetMetroCacheBeforeBundling).isTrue()
+  }
+
+  @Test
+  fun shouldResetMetroCacheBeforeBundling_withInvalidViaScopedProperty_returnsTrue() {
+    val project = createProject()
     project.extensions.extraProperties.set("react.resetMetroCacheBeforeBundling", "¯\\_(ツ)_/¯")
     assertThat(project.shouldResetMetroCacheBeforeBundling).isTrue()
+  }
+
+  @Test
+  fun shouldResetMetroCacheBeforeBundling_withBothProperties_scopedPropertyWins() {
+    val project = createProject()
+    project.extensions.extraProperties.set("resetMetroCacheBeforeBundling", "true")
+    project.extensions.extraProperties.set("react.resetMetroCacheBeforeBundling", "false")
+    assertThat(project.shouldResetMetroCacheBeforeBundling).isFalse()
   }
 
   @Test
